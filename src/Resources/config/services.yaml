@@ -30,7 +30,7 @@ services:
         class: Contao\InstallationBundle\InstallToolUser
         public: true
         arguments:
-            - '@session'
+            - '@request_stack'
 
     contao_installation.listener.initialize_application:
         class: Contao\InstallationBundle\EventListener\InitializeApplicationListener

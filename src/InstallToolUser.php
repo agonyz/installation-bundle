@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Contao\InstallationBundle;
 
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class InstallToolUser
 {
@@ -21,18 +21,18 @@ class InstallToolUser
     /**
      * @internal Do not inherit from this class; decorate the "contao_installation.install_tool_user" service instead
      */
-    public function __construct(private Session $session)
+    public function __construct(private RequestStack $requestStack)
     {
     }
 
     public function isAuthenticated(): bool
     {
-        if (!$this->session->has('_auth_until') || $this->session->get('_auth_until') < time()) {
+        if (!$this->requestStack->getSession()->has('_auth_until') || $this->requestStack->getSession()->get('_auth_until') < time()) {
             return false;
         }
 
         // Update the expiration date
-        $this->session->set('_auth_until', time() + $this->timeout);
+        $this->requestStack->getSession()->set('_auth_until', time() + $this->timeout);
 
         return true;
     }
@@ -40,9 +40,9 @@ class InstallToolUser
     public function setAuthenticated(bool $authenticated): void
     {
         if (true === $authenticated) {
-            $this->session->set('_auth_until', time() + $this->timeout);
+            $this->requestStack->getSession()->set('_auth_until', time() + $this->timeout);
         } else {
-            $this->session->remove('_auth_until');
+            $this->requestStack->getSession()->remove('_auth_until');
         }
     }
 }
